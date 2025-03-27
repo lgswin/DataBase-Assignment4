@@ -1,0 +1,18 @@
+---
+- name: Start and maintain database
+  hosts: localhost
+  tasks:
+
+  - name: Ansible hello world
+    ansible.builtin.debug:
+      msg: Hello from ansible in up.yaml
+  - name: stop mysql
+    ansible.builtin.shell: sudo service mysql stop > /tmp/mysqldown.txt
+    args:
+      creates: /tmp/mysqldown.txt
+  - name: Remove mysql.txt file (delete file)
+    ansible.builtin.file:
+      path: /tmp/mysql.txt
+      state: absent
+
+
