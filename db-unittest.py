@@ -1,12 +1,13 @@
 import unittest
 import mysql.connector
+from datetime import datetime
 
 class TestDatabase(unittest.TestCase):
     def setUp(self):
         self.conn = mysql.connector.connect(
             user='flyway_user',
             password='Secret5555',
-            host='localhost',
+            host='127.0.0.1',
             database='subscriber_db'
         )
         self.cursor = self.conn.cursor()
@@ -38,6 +39,42 @@ class TestDatabase(unittest.TestCase):
         self.assertIn('created_at', columns, "❌ created_at column does not exist")
         self.assertTrue(columns['created_at'].startswith('timestamp'), 
                        "❌ created_at column should be timestamp type")
+
+    def test_subscription_date_column(self):
+        # Check if subscription_date column exists and has correct type
+        self.cursor.execute("DESCRIBE subscribers")
+        columns = {col[0]: col[1] for col in self.cursor.fetchall()}
+        
+        self.assertIn('subscription_date', columns, "❌ subscription_date column does not exist")
+        self.assertTrue(columns['subscription_date'].startswith('timestamp'), 
+                       "❌ subscription_date column should be timestamp type")
+
+        # Test automatic population of subscription_date
+        test_name = "Test User"
+        test_email = "test@example.com"
+        
+        # Insert a new subscriber
+        self.cursor.execute(
+            "INSERT INTO subscribers (name, email) VALUES (%s, %s)",
+            (test_name, test_email)
+        )
+        self.conn.commit()
+
+        # Verify the subscription_date was automatically set
+        self.cursor.execute(
+            "SELECT subscription_date FROM subscribers WHERE email = %s",
+            (test_email,)
+        )
+        result = self.cursor.fetchone()
+        self.assertIsNotNone(result[0], "❌ subscription_date should not be null")
+        
+        # Verify the date is recent
+        subscription_date = result[0]
+        self.assertIsInstance(subscription_date, datetime, "❌ subscription_date should be a datetime object")
+        
+        # Clean up test data
+        self.cursor.execute("DELETE FROM subscribers WHERE email = %s", (test_email,))
+        self.conn.commit()
 
     def test_data_integrity(self):
         # Check if database contains data
