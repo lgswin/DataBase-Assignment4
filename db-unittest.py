@@ -19,7 +19,7 @@ class TestDatabase(unittest.TestCase):
         # Check if 'subscribers' table exists
         self.cursor.execute("SHOW TABLES LIKE 'subscribers'")
         table_exists = self.cursor.fetchone()
-        self.assertIsNotNone(table_exists, "❌ Table 'subscribers' does not exist")
+        self.assertIsNotNone(table_exists, "Table 'subscribers' does not exist")
 
         # Check column structure
         self.cursor.execute("DESCRIBE subscribers")
@@ -36,18 +36,18 @@ class TestDatabase(unittest.TestCase):
         self.cursor.execute("DESCRIBE subscribers")
         columns = {col[0]: col[1] for col in self.cursor.fetchall()}
         
-        self.assertIn('created_at', columns, "❌ created_at column does not exist")
+        self.assertIn('created_at', columns, "created_at column does not exist")
         self.assertTrue(columns['created_at'].startswith('timestamp'), 
-                       "❌ created_at column should be timestamp type")
+                       "created_at column should be timestamp type")
 
     def test_subscription_date_column(self):
         # Check if subscription_date column exists and has correct type
         self.cursor.execute("DESCRIBE subscribers")
         columns = {col[0]: col[1] for col in self.cursor.fetchall()}
         
-        self.assertIn('subscription_date', columns, "❌ subscription_date column does not exist")
+        self.assertIn('subscription_date', columns, "subscription_date column does not exist")
         self.assertTrue(columns['subscription_date'].startswith('timestamp'), 
-                       "❌ subscription_date column should be timestamp type")
+                       "subscription_date column should be timestamp type")
 
         # Test automatic population of subscription_date
         test_name = "Test User"
@@ -66,11 +66,11 @@ class TestDatabase(unittest.TestCase):
             (test_email,)
         )
         result = self.cursor.fetchone()
-        self.assertIsNotNone(result[0], "❌ subscription_date should not be null")
+        self.assertIsNotNone(result[0], "subscription_date should not be null")
         
         # Verify the date is recent
         subscription_date = result[0]
-        self.assertIsInstance(subscription_date, datetime, "❌ subscription_date should be a datetime object")
+        self.assertIsInstance(subscription_date, datetime, "subscription_date should be a datetime object")
         
         # Clean up test data
         self.cursor.execute("DELETE FROM subscribers WHERE email = %s", (test_email,))
@@ -80,15 +80,15 @@ class TestDatabase(unittest.TestCase):
         # Check if database contains data
         self.cursor.execute("SELECT COUNT(*) FROM subscribers")
         count = self.cursor.fetchone()[0]
-        self.assertGreater(count, 0, "❌ Database should contain at least one subscriber")
+        self.assertGreater(count, 0, "Database should contain at least one subscriber")
 
         # Check if required fields are not null
         self.cursor.execute("SELECT name, email FROM subscribers")
         for row in self.cursor.fetchall():
-            self.assertIsNotNone(row[0], "❌ name field should not be null")
-            self.assertIsNotNone(row[1], "❌ email field should not be null")
-            self.assertIsInstance(row[0], str, "❌ name should be a string")
-            self.assertIsInstance(row[1], str, "❌ email should be a string")
+            self.assertIsNotNone(row[0], "name field should not be null")
+            self.assertIsNotNone(row[1], "email field should not be null")
+            self.assertIsInstance(row[0], str, "name should be a string")
+            self.assertIsInstance(row[1], str, "email should be a string")
 
 if __name__ == '__main__':
     unittest.main()
