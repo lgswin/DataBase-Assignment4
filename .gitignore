@@ -177,3 +177,4 @@ migrations/.DS_Store
 *.docx
 .DS_Store
 .DS_Store
+flyway.tar.gz

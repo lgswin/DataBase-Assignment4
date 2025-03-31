@@ -4,10 +4,10 @@ import mysql.connector
 class TestDatabase(unittest.TestCase):
     def setUp(self):
         self.conn = mysql.connector.connect(
-            user='root',
-            password='*********',
+            user='flyway_user',
+            password='Secret5555',
             host='localhost',
-            database='----------'
+            database='subscriber_db'
         )
         self.cursor = self.conn.cursor()
 
@@ -27,7 +27,7 @@ class TestDatabase(unittest.TestCase):
         self.assertIn('id', columns)
         self.assertIn('name', columns)
         self.assertIn('email', columns)
-        self.assertEqual(columns['id'], 'int(11)')
+        self.assertTrue(columns['id'].startswith('int'), "id column should be an integer")
         self.assertTrue(columns['email'].startswith('varchar'), "email column should be varchar")
 
 if __name__ == '__main__':

@@ -4,7 +4,12 @@
 
   - name: Ansible hello world
     ansible.builtin.debug:
-      msg: Hello from ansible in up.yaml
+      msg: Hello from ansible in down.yaml
+  - name: Dump data for migration
+    ansible.builtin.shell: |
+      mysqldump -u flyway_user -pSecret5555 -h 127.0.0.1 --no-create-info subscriber_db subscribers > migrations/V2__seed_data.sql
+    args:
+      creates: migrations/V2__seed_data.sql
   - name: stop mysql
     ansible.builtin.shell: sudo service mysql stop > /tmp/mysqldown.txt
     args:
